@@ -19,11 +19,3 @@ To use the geocoding api you need to set the environment variable `GEOCODE_API`.
 Now you can open the notebook and execute the code. If you open it in vs code you will be asked to select which kernel to use. Select the one that was created by poetry.
 
 ![](img/select-kernel.png)
-
-# Run the application
-
-To run the application, run the following command:
-
-```bash
-poetry run python -m app
-```
