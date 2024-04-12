@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "system-integration-training-ground"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "system_integration_training_ground"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.110.1"
+pydantic = "^2.6.4"
+uvicorn = "^0.29.0"
+requests = "^2.31.0"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.4"
+matplotlib = "^3.8.4"
+pandas = "^2.2.2"
+dotenv = "^0.0.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
