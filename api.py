@@ -1,9 +1,15 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, UUID4
 
+import requests
+import dotenv
+
 from uuid import uuid4
 
 app = FastAPI()
+
+OPENAI_URL="https://api.openai.com/v1/chat/completions"
+openai_key = dotenv.get_variable('.env', "OPENAI_KEY")
 
 class Question(BaseModel):
     """Schema for a question."""
@@ -21,11 +27,46 @@ class QuestionCreate(BaseModel):
 
 questions: list[Question] = []
 
+def get_answer_from_ai(question_text: str) -> str:
+    """Returns an answer from an AI model."""
+
+    headers = {
+        'Authorization': f'Bearer {openai_key}',
+        'Content-Type': 'application/json'
+    }
+
+    # Data to be sent (query)
+    data = {
+        "model": "gpt-3.5-turbo",
+        "messages": [
+            {
+                "role": "system",
+                "content": "Du är en tålmodig lärare som alltid är beredd med ett svar."
+            },
+            {
+                "role": "user",
+                "content": question_text
+            }
+        ]
+    }
+
+    # Making the POST request
+    response = requests.post(OPENAI_URL, headers=headers, json=data)
+
+    if (response.status_code != 200):
+        return "Sorry, I don't know the answer to that question."
+    
+    results = response.json()
+
+    return results["choices"][0]["message"]["content"]
+
 @app.get("/")
 def read_root():
-    """Returns a simple message."""
+    """Returns a simple message.
+    
+    This message is unexpected, but it is a good message."""
 
-    return {"message": "Hello World!"}
+    return {"message": "Hello World!"} # This is a comment
 
 @app.get("/question")
 def get_all_questions() -> list[Question]:
@@ -37,9 +78,15 @@ def get_all_questions() -> list[Question]:
 def add_question(new_question: QuestionCreate) -> Question:
     """Adds a new question to the list of questions."""
 
-    q_id = uuid4()
+    unique_id = uuid4()
 
-    created_question = Question(q_id=q_id, question=new_question.question, answer=None)
+    ai_answer = get_answer_from_ai(new_question.question)
+
+    created_question = Question(
+        q_id=unique_id,
+        question=new_question.question,
+        answer=ai_answer
+    )
     questions.append(created_question)
 
     return created_question
