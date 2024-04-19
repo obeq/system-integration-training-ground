@@ -1,0 +1,29 @@
+{
+  "recept": {
+    "namn": "Chokladomelett",
+    "portioner": 8,
+    "ingredienser": [
+      {
+        "mangd": "200g",
+        "typ": "choklad",
+        "beskrivning": "Mork choklad"
+      },
+      {
+        "mangd": "100g",
+        "typ": "smor",
+        "beskrivning": "Smor"
+      },
+      {
+        "mangd": "3st",
+        "typ": "agg",
+        "beskrivning": "Agg"
+      }
+    ],
+    "instruktioner": [
+      "Smalt chokladen och smoret i ett vattenbad",
+      "Vispa aggen och sockret posigt",
+      "Blanda alla ingredienser och hall i en form.",
+      "Gradda i ugnen pa 175 grader i 25 minuter"
+    ]
+  }
+}
