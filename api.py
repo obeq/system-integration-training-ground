@@ -2,14 +2,17 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, UUID4
 
 import requests
-import dotenv
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 from uuid import uuid4
 
 app = FastAPI()
 
 OPENAI_URL="https://api.openai.com/v1/chat/completions"
-openai_key = dotenv.get_variable('.env', "OPENAI_KEY")
+# openai_key = dotenv.get_variable('.env', "OPENAI_KEY")
+OPENAI_KEY = os.getenv("OPENAI_KEY")
 
 class Question(BaseModel):
     """Schema for a question."""
@@ -31,7 +34,7 @@ def get_answer_from_ai(question_text: str) -> str:
     """Returns an answer from an AI model."""
 
     headers = {
-        'Authorization': f'Bearer {openai_key}',
+        'Authorization': f'Bearer {OPENAI_KEY}',
         'Content-Type': 'application/json'
     }
 
