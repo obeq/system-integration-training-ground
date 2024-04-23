@@ -1,4 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from typing import Annotated
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.security import HTTPBasic, HTTPBasicCredentials, OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel, UUID4
 
 import requests
@@ -10,9 +12,17 @@ from uuid import uuid4
 
 app = FastAPI()
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+security = HTTPBasic()
+
 OPENAI_URL="https://api.openai.com/v1/chat/completions"
 # openai_key = dotenv.get_variable('.env', "OPENAI_KEY")
 OPENAI_KEY = os.getenv("OPENAI_KEY")
+
+class User(BaseModel):
+    username: str
+    email: str | None = None
+
 
 class Question(BaseModel):
     """Schema for a question."""
@@ -29,6 +39,17 @@ class QuestionCreate(BaseModel):
 
 
 questions: list[Question] = []
+
+# def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
+#     """Returns the current user."""
+
+#     return User(username=token + "user", email=token + "@example.com")
+
+def get_current_user(credentials: Annotated[HTTPBasicCredentials, Depends(security)]) -> User:
+    """Returns the current user."""
+
+    return User(username=credentials.username, email=credentials.username + "@example.com")
+
 
 def get_answer_from_ai(question_text: str) -> str:
     """Returns an answer from an AI model."""
@@ -78,7 +99,7 @@ def get_all_questions() -> list[Question]:
     return questions
 
 @app.post("/question", status_code=201)
-def add_question(new_question: QuestionCreate) -> Question:
+def add_question(new_question: QuestionCreate, current_user: Annotated[User, Depends(get_current_user)]) -> Question:
     """Adds a new question to the list of questions."""
 
     unique_id = uuid4()
@@ -136,3 +157,7 @@ def add_answer(q_id: UUID4, answer: str) -> Question:
             return question
 
     raise HTTPException(404, f"Question with id {q_id} not found!")
+
+@app.post("/token")
+def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+    return {"access_token": form_data.username[::-1], "token_type": "bearer"}
